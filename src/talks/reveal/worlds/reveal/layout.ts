@@ -17,7 +17,7 @@ import { storyId } from "../steps";
 export const TITLE = { x: 96, y: 152 };
 
 /** Each slide's title, broken where it would run past the stage's safe edge. */
-const BREAKS: Record<string, string[]> = { catalog: ["projects,"], how: ["form."], built: ["built it"] };
+const BREAKS: Record<string, string[]> = { catalog: ["projects,"], how: ["easy"], built: ["built it"] };
 
 export const titleKey = (pictureId: string) => `title.${pictureId}`;
 export const titleOf = (pictureId: string) => ({ key: titleKey(pictureId), x: TITLE.x, y: TITLE.y, lines: breakAfter(pictureOf(pictureId).show, ...(BREAKS[pictureId] ?? [])) });
