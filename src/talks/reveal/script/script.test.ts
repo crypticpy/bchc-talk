@@ -74,7 +74,7 @@ const everything = [...voiced, ...SCRIPT.flatMap((picture) => [picture.name, ...
 const OFF_SCRIPT = [ADDRESS];
 
 /** Labels allowed past 60 characters: the thank-you cards' lines, set on several rows inside their cards. */
-const LONG_LABEL = ["For hosting this workshop, and for helping the coalition get set up on GitHub.", "For the idea, the push to launch, and the Data Modernization Work Group."];
+const LONG_LABEL = ["For hosting this workshop, and for helping the coalition get set up on GitHub.", "For the idea, and for getting it launched."];
 
 const KEBAB = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const BANNED = /\b(leverag\w*|seamless\w*|delv\w*|tapestry|robust|game[- ]chang\w*|cutting[- ]edge|unlock\w*|empower\w*)\b/i;
