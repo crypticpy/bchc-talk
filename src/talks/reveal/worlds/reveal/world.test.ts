@@ -8,14 +8,18 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { compile } from "@/components/deck/engine/compile";
-import { CHAIN, CONTENT_TOP, STAGE, STORY, storyKeys } from "@/components/deck/kit";
+import { CHAIN, CONTENT_TOP, STAGE, STORY, box, storyKeys, type Box } from "@/components/deck/kit";
 import { VENDOR_COLOURS, strayTokens } from "@/components/deck/kit/palette";
+import { TAB_H } from "@/components/deck/kit/tab";
 import { storyId } from "../steps";
 import { compiled, endState, hiddenAt, longestStep, markup, movesOf, nodeOf, nodes, pictureOfKey, pictures, playsOf, steps, text } from "./harness";
 import { BUILT, ENTRY, HOME, HOW, OPENING, POST, ROW_ON_STAGE, STILLS, THANK } from "./layout";
 import { revealEntry } from "./world";
 
 const shows = (id: string, key: string) => !hiddenAt(endState(id), nodeOf(key));
+const bottom = (at: Box) => at.y + at.h;
+const inside = (a: Box, b: Box) => a.x >= b.x && a.y >= b.y && a.x + a.w <= b.x + b.w && bottom(a) <= bottom(b);
+const apart = (a: Box, b: Box) => a.x + a.w <= b.x || b.x + b.w <= a.x || bottom(a) <= b.y || bottom(b) <= a.y;
 
 describe("the reveal world", () => {
   it("compiles, with a starting value for everything a step moves", () => {
@@ -100,6 +104,38 @@ describe("the reveal world", () => {
     expect(new Set(rings).size).toBe(3);
   });
 
+  it("shows the live catalog's real project page on slide 2: a frame of the crop's own shape, under the story band, right of the small home page, and not the main deck's sample entry", () => {
+    expect(STILLS.entry[0].src).toMatch(/\/reveal\/catalog-entry\.v\d+\.webp$/);
+    const { at, crop } = ENTRY;
+    const capture = readFileSync(new URL("../../capture-entry.mjs", import.meta.url), "utf8");
+    expect(capture).toContain(`w: ${crop.w}, h: ${crop.h} }`);
+    expect(Math.abs(at.h - (at.w * crop.h) / crop.w)).toBeLessThanOrEqual(1);
+    expect(at.y).toBeGreaterThanOrEqual(CONTENT_TOP.two);
+    expect(bottom(at)).toBeLessThanOrEqual(1004);
+    expect(at.x + at.w).toBeLessThanOrEqual(STORY.x + STORY.w);
+    const smallRight = HOME.at.x + HOME.small["--x"] + HOME.at.w * HOME.small["--s"];
+    expect(at.x - smallRight).toBeGreaterThanOrEqual(32);
+    const sources = (dir: URL): string[] =>
+      readdirSync(dir, { withFileTypes: true }).flatMap((entry) => (entry.isDirectory() ? sources(new URL(`${entry.name}/`, dir)) : [readFileSync(new URL(entry.name, dir), "utf8")]));
+    expect(sources(new URL("../../", import.meta.url)).filter((source) => source.includes(["catalog-entry", "v4"].join(".")))).toEqual([]);
+  });
+
+  it("rings the name and summary, the grid of facts and the contact panel where the capture measured them, each ring and its tab inside the page's frame", () => {
+    const { at, crop, places, fields } = ENTRY;
+    const scale = at.w / crop.w;
+    const onFrame = (place: Box) => box(place.x * scale, place.y * scale, place.w * scale, place.h * scale);
+    const frame = box(0, 0, at.w, at.h);
+    const ringed = [[places.title, places.summary], [places.facts], [places.contact]];
+    expect(fields).toHaveLength(3);
+    fields.forEach((field, i) => {
+      const ring = field.ring.at;
+      for (const place of ringed[i]) expect(inside(onFrame(place), ring), field.ring.key).toBe(true);
+      expect(inside(ring, frame), field.ring.key).toBe(true);
+      expect(field.tab.at.y >= 0 && field.tab.at.y + TAB_H <= at.h, field.tab.key).toBe(true);
+      for (const other of fields.slice(i + 1)) expect(apart(ring, other.ring.at), `${field.ring.key} and ${other.ring.key}`).toBe(true);
+    });
+  });
+
   it("sets the person's orange mark only where a person approves: at Approval, on the last of the three steps, and on each change on the record", () => {
     const marks = [...markup.matchAll(/<g class="dk-human" data-build="([^"]+)"/g)].map(([, key]) => key);
     expect(marks.sort()).toEqual([HOW.mark.key, BUILT.mark.key, ...BUILT.commits.map((commit) => commit.approval)].sort());
@@ -161,6 +197,6 @@ describe("the reveal world", () => {
 
   it("names no company with a logo but Austin Public Health", () => {
     const images = [...markup.matchAll(/<img [^>]*src="([^"]+)"/g)].map(([, src]) => src);
-    expect(images.filter((src) => !/catalog-entry|reveal\/catalog-home|aph-logo|\/reveal\/qr\.svg/.test(src))).toEqual([]);
+    expect(images.filter((src) => !/reveal\/catalog-(home|entry)|aph-logo|\/reveal\/qr\.svg/.test(src))).toEqual([]);
   });
 });

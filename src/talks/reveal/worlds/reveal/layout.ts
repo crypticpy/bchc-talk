@@ -36,10 +36,17 @@ export const LINE = 44.8;
 /** The stills, as saved: a version in the name, because a changed picture under an old name is served from cache. */
 export const STILLS = {
   home: [{ src: withBase("/reveal/catalog-home.v1.webp"), alt: "The live catalog's home page: its name, the headline Reuse what other health departments have already built, a search box, and the buttons Browse the catalog and Share your use case" }],
-  entry: [{ src: withBase("/catalog-entry.v4.webp"), alt: "One project's page in the catalog: what it does, what it took to stand up, and who to contact" }],
+  entry: [
+    {
+      src: withBase("/reveal/catalog-entry.v1.webp"),
+      alt: "One project's page in the live catalog, Machine learning record linkage from Public Health – Seattle & King County: what it does, the skills, readiness and cost it took to stand up, and who to contact",
+    },
+  ],
 };
 /** The home page's still is the top of the live page, 1280 by 570 of its pixels (capture-home.mjs), saved at twice that. */
 const HOME_CROP = { w: 1280, h: 570 };
+/** The project's page's still is the top of its live page, 1248 by 560 of its pixels (capture-entry.mjs), saved at twice that. */
+const ENTRY_CROP = { w: 1248, h: 560 };
 
 /** Slide 1: the title, the line under it at 48, the credit in soft, and the catalog's home page on the right. */
 export const OPENING = {
@@ -51,15 +58,17 @@ export const OPENING = {
 /** The home page at rest on slide 1, whole, in a frame of the crop's own shape: on the right under the credit, its right edge on the safe edge. */
 const HOME_W = 1152;
 const HOME_AT = box(STORY.x + STORY.w - HOME_W, 460, HOME_W, Math.round((HOME_W * HOME_CROP.h) / HOME_CROP.w));
-/** Where slide 2 carries it: the left column, level with the opened page. */
-const HOME_SMALL = { x: 96, w: 448 };
 /** How far the home page rises as it comes in, and how small it starts. */
 export const HOME_RISE = { y: 80, s: 0.96 };
 
 /* 2. The catalog */
 
-/** One project's page, under the two-line title's story band: the top of its page, half the still's 2464 by 936. */
-const ENTRY_AT = box(592, CONTENT_TOP.two + 16, 1232, 468);
+/** One project's page, under the two-line title's story band, in a frame of the crop's own shape 468 high: its right edge on the safe edge. */
+const ENTRY_H = 468;
+const ENTRY_W = Math.round((ENTRY_H * ENTRY_CROP.w) / ENTRY_CROP.h);
+const ENTRY_AT = box(STORY.x + STORY.w - ENTRY_W, CONTENT_TOP.two + 16, ENTRY_W, ENTRY_H);
+/** Where slide 2 carries the home page: the left column, 48 px short of the opened page and level with it. */
+const HOME_SMALL = { x: STORY.x, w: ENTRY_AT.x - 48 - STORY.x };
 const homeScale = HOME_SMALL.w / HOME_AT.w;
 /** The home page as it sits small on slide 2: the project's page lifts out of it. */
 const HOME_SMALL_AT = box(HOME_SMALL.x, Math.round(ENTRY_AT.y + ENTRY_AT.h / 2 - (HOME_AT.h * homeScale) / 2), HOME_SMALL.w, HOME_AT.h * homeScale);
@@ -75,20 +84,37 @@ export const HOME = {
   small: { "--x": HOME_SMALL_AT.x - HOME_AT.x, "--y": HOME_SMALL_AT.y - HOME_AT.y, "--s": round2(homeScale) },
 };
 
-/** A ring round a place on a still: the place, opened out by `pad` so the ink clears what it rings. */
-const round = (x: number, y: number, w: number, h: number, pad = 0) => box(x - pad, y - pad, w + 2 * pad, h + 2 * pad);
-/** The page's grid of facts, from the skills cell to the cost cell, ringed a little inside its edges. */
-const FACTS = box(19, 325, 850, 129);
+/**
+ * Where the parts slide 2 rings sit on the project's page, in the crop's own
+ * (page) pixels, as capture-entry.mjs prints them: the project's name, the
+ * summary under it, the grid of facts, and the contact panel.
+ */
+const ENTRY_PLACES = { title: box(16, 60, 704, 48), summary: box(16, 128, 704, 26), facts: box(16, 286, 888, 204), contact: box(952, 392, 280, 148) };
+const entryScale = ENTRY_AT.w / ENTRY_CROP.w;
+/** A ring round places on the page, in the frame's pixels: from the first place's top left to the last's foot, opened out by `pad` page pixels so the ink clears what it rings. */
+const ringRound = (first: Box, last: Box, pad: number) => {
+  const [x, y] = [first.x - pad, first.y - pad];
+  const [right, foot] = [Math.max(first.x + first.w, last.x + last.w) + pad, last.y + last.h + pad];
+  return box(Math.round(x * entryScale), Math.round(y * entryScale), Math.round((right - x) * entryScale), Math.round((foot - y) * entryScale));
+};
+/**
+ * What it does: the name and summary, its tab on the right in the empty
+ * page beside them. What it took: the grid of facts (skills, readiness, the
+ * cost to stand up), its tab under it. Contact: the panel, its tab on top
+ * of it, where the hidden "On this page" box held its place.
+ */
 const RINGS: { ring: Box; side: Parameters<typeof tabBeside>[1] }[] = [
-  { ring: round(16, 60, 704, 190, 6), side: "right" },
-  { ring: FACTS, side: "above-left" },
-  { ring: round(920, 212, 280, 176, 6), side: "left" },
+  { ring: ringRound(ENTRY_PLACES.title, ENTRY_PLACES.summary, 8), side: "right" },
+  { ring: ringRound(ENTRY_PLACES.facts, ENTRY_PLACES.facts, 6), side: "below-left" },
+  { ring: ringRound(ENTRY_PLACES.contact, ENTRY_PLACES.contact, 6), side: "above-left" },
 ];
 
 export const ENTRY = {
   key: "catalog.entry",
   still: "catalog.entry.still",
   at: ENTRY_AT,
+  crop: ENTRY_CROP,
+  places: ENTRY_PLACES,
   /** Where the page starts: as wide as the small home page, centred on it, as a move about its top left corner. */
   lifted: {
     "--x": Math.round(HOME_SMALL_AT.x + HOME_SMALL_AT.w / 2 - (ENTRY_AT.w * lift) / 2 - ENTRY_AT.x),
