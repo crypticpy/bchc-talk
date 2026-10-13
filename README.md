@@ -4,6 +4,8 @@ The slides for Austin Public Health's talk to the Big Cities Health Coalition Da
 
 Live: https://crypticpy.github.io/bchc-talk/
 
+A second, shorter deck, the ten-minute reveal of the coalition's use case catalog at AIxPH 2026 in Baltimore, is at `/reveal/` (live: https://crypticpy.github.io/bchc-talk/reveal/). Its script is `docs/reveal-script.md`.
+
 The repo is also a starting point for your own talk built the same way: animated, click to play, with every word held to an approved script, and built with an AI coding agent. See [Build your own deck from this](#build-your-own-deck-from-this).
 
 ## Run it on your computer

@@ -1,0 +1,38 @@
+/* The frame's three parts, in stage pixels, in the 64 px edge round the
+   safe area: the logo above it, the footer and the number below it. The
+   number's right edge stops at 1648, clear of the deck's corner (its counter
+   and its back and forward buttons). The corner is laid out in window pixels,
+   about 150 px wide, so in a 1280 window it covers about 225 stage pixels. */
+
+.reveal-frame__logo {
+  position: absolute;
+  top: 14px;
+  left: 96px;
+}
+
+.reveal-frame__footer,
+.reveal-frame__number {
+  position: absolute;
+  top: 1034px;
+  margin: 0;
+  font-family: var(--dk-face);
+  font-size: 20px;
+  line-height: 24px;
+  color: var(--dk-soft);
+  white-space: nowrap;
+}
+
+.reveal-frame__footer {
+  left: 96px;
+}
+
+.reveal-frame__footer b {
+  font-weight: 600;
+  color: var(--dk-paper);
+}
+
+.reveal-frame__number {
+  right: 272px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}

@@ -1,0 +1,110 @@
+/* The reveal's own marks, in stage pixels and under the kit's rules
+   (kit.css): paper, soft and rule; the process's colour on what the process
+   does; the pass tint and coral only through the kit's PassTick and
+   HumanMark. Every state arrives as a custom property a move sets (--d,
+   --k), so a cut and a build end alike. */
+
+/* Slide 3's row: a holder at the stage's corner, like the row itself, that the scene scales so the row spans the band. */
+.reveal-row {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Slide 3's Approval box: outlined in navy, heavier than the other wells, so the person's mark over it is the only orange on the row. */
+.dk-well--human[data-build="how.row.human"] {
+  stroke: var(--dk-paper);
+}
+
+/* Draft and Checks, where scripts do the work: the fill a card leaves there is the process's tint, not the quiet paper one. */
+.dk-well__done[data-build="how.row.s2.done"],
+.dk-well__done[data-build="how.row.s3.done"] {
+  background: var(--dk-process);
+  opacity: var(--dk-tint-idle);
+}
+
+/* Slide 4's three steps: people decide in soft, the agents' step in the process's colour with its quiet tint, and the step where a person approves in a heavier navy. */
+.reveal-step {
+  fill: none;
+  stroke: var(--dk-soft);
+  stroke-width: 2.5;
+}
+
+.reveal-step--process {
+  fill: var(--dk-process);
+  fill-opacity: calc(var(--d, 0) * var(--dk-wash));
+  stroke: var(--dk-process);
+}
+
+.reveal-step--human {
+  stroke: var(--dk-paper);
+  stroke-width: 3.5;
+}
+
+/* A change on the record: a ring in soft on the ground, which the approval's half-size mark lands over. */
+.reveal-commit {
+  fill: var(--dk-night);
+  stroke: var(--dk-soft);
+  stroke-width: 2.5;
+}
+
+/* The approvals on the record are the human mark at half size: its ring is set twice as heavy, so it draws at the mark's own weight. */
+.reveal-history .dk-human__ring {
+  stroke-width: 7;
+}
+
+/* "On GitHub", the record's name: semibold, so it reads as a name and not a caption. */
+.dk-block.reveal-strong {
+  font-weight: 600;
+}
+
+/* Slide 5's thank-you cards: who, set large, what for, and the person, on the plain ground in a rule outline. */
+.dk-block.reveal-card {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  box-sizing: border-box;
+  padding: 40px;
+  border: 2.5px solid var(--dk-rule);
+  border-top: 6px solid var(--dk-paper);
+  border-radius: 12px;
+}
+
+.reveal-card__name {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  /* Two lines tall on every card, so the three cards' lines start level. */
+  min-height: 2.24em;
+}
+
+.reveal-card__line {
+  flex: 1;
+}
+
+.reveal-card__who {
+  font-weight: 600;
+}
+
+/* Slide 6's address: large and semibold, on two lines. */
+.dk-block.reveal-address {
+  font-size: 76px;
+  font-weight: 600;
+  line-height: 1.16;
+  letter-spacing: -0.015em;
+}
+
+.dk-block.reveal-address > span {
+  display: block;
+  white-space: nowrap;
+}
+
+/* The QR code fills its block. */
+.reveal-qr img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
